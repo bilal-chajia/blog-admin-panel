@@ -63,8 +63,8 @@ export const formatRelativeTime = (date) => {
 export const safeJSONParse = (str, fallback = null) => {
   try {
     return JSON.parse(str);
-  } catch (e) {
-    console.error('JSON parse error:', e);
+  } catch {
+    console.error('JSON parse error');
     return fallback;
   }
 };
@@ -75,8 +75,8 @@ export const safeJSONParse = (str, fallback = null) => {
 export const safeJSONStringify = (obj, pretty = false) => {
   try {
     return JSON.stringify(obj, null, pretty ? 2 : 0);
-  } catch (e) {
-    console.error('JSON stringify error:', e);
+  } catch {
+    console.error('JSON stringify error');
     return '';
   }
 };
@@ -88,7 +88,7 @@ export const isValidJSON = (str) => {
   try {
     JSON.parse(str);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -143,7 +143,7 @@ export const isValidURL = (url) => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -196,7 +196,7 @@ export const deepClone = (obj) => {
  */
 export const removeEmpty = (obj) => {
   return Object.fromEntries(
-    Object.entries(obj).filter(([_, v]) => v != null && v !== '')
+    Object.entries(obj).filter(([, v]) => v != null && v !== '')
   );
 };
 

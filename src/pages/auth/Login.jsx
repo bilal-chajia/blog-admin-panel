@@ -11,21 +11,36 @@ import { useAuthStore } from '../../store/useStore';
 const Login = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    email: 'admin@freecipies.com',
-    password: 'admin123',
+    email: '',
+    password: '',
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    // For development: bypass auth
-    setAuth({ name: 'Admin', email: formData.email }, 'dev-token');
-    localStorage.setItem('admin_token', 'dev-token');
-    navigate('/');
+    const loading = true;
+
+    try {
+      const response = await authAPI.login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.data.success) {
+        const { user, token } = response.data.data;
+        setAuth(user, token);
+        localStorage.setItem('admin_token', token);
+        navigate('/');
+      } else {
+        setError('Invalid credentials');
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Login failed');
+    } finally {
+      // Loading complete
+    }
   };
 
   return (
@@ -75,8 +90,8 @@ const Login = () => {
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" className="w-full" size="lg">
+              Sign In
             </Button>
           </form>
         </CardContent>

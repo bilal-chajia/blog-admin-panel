@@ -20,8 +20,8 @@ const BoardsList = () => {
       setLoading(true);
       const response = await pinterestBoardsAPI.getAll();
       setBoards(response.data.boards || []);
-    } catch (error) {
-      console.error('Failed to load boards:', error);
+    } catch {
+      console.error('Failed to load boards');
     } finally {
       setLoading(false);
     }

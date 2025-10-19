@@ -34,7 +34,6 @@ import { useArticlesStore, useCategoriesStore, useAuthorsStore } from '../../sto
 const ArticlesList = () => {
   const { articles, filters, pagination, setArticles, setFilters, setPagination } = useArticlesStore();
   const { categories, setCategories } = useCategoriesStore();
-  const { authors, setAuthors } = useAuthorsStore();
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -42,7 +41,7 @@ const ArticlesList = () => {
     loadCategories();
     loadAuthors();
     loadArticles();
-  }, [filters, pagination.page]);
+  }, [filters, pagination.page, loadArticles, loadAuthors, loadCategories]);
 
   const loadArticles = async () => {
     try {

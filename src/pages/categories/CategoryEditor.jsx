@@ -33,7 +33,7 @@ const CategoryEditor = () => {
 
   useEffect(() => {
     if (isEditMode) loadCategory();
-  }, [slug]);
+  }, [slug, isEditMode, loadCategory]);
 
   const loadCategory = async () => {
     try {
@@ -57,7 +57,7 @@ const CategoryEditor = () => {
           sortOrder: cat.sortOrder,
         });
       }
-    } catch (error) {
+    } catch {
       alert('Failed to load category');
     }
   };
@@ -71,7 +71,7 @@ const CategoryEditor = () => {
         await categoriesAPI.create(formData);
       }
       navigate('/categories');
-    } catch (error) {
+    } catch {
       alert('Failed to save category');
     } finally {
       setSaving(false);

@@ -25,7 +25,7 @@ const BoardEditor = () => {
 
   useEffect(() => {
     if (isEditMode) loadBoard();
-  }, [id]);
+  }, [id, isEditMode, loadBoard]);
 
   const loadBoard = async () => {
     try {
@@ -38,7 +38,7 @@ const BoardEditor = () => {
         board_url: board.board_url || '',
         is_active: board.is_active === 1,
       });
-    } catch (error) {
+    } catch {
       alert('Failed to load board');
       navigate('/pinterest/boards');
     }
@@ -58,7 +58,7 @@ const BoardEditor = () => {
         await pinterestBoardsAPI.create(formData);
       }
       navigate('/pinterest/boards');
-    } catch (error) {
+    } catch {
       alert('Failed to save board');
     } finally {
       setSaving(false);

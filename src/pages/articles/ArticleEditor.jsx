@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select.jsx';
 import Editor from '@monaco-editor/react';
 import { articlesAPI, categoriesAPI, authorsAPI, tagsAPI } from '../../services/api';
-import { generateSlug, isValidJSON, safeJSONParse } from '../../utils/helpers';
+import { generateSlug, isValidJSON } from '../../utils/helpers';
 
 const ArticleEditor = () => {
   const { slug } = useParams();
@@ -27,7 +27,6 @@ const ArticleEditor = () => {
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState([]);
   const [authors, setAuthors] = useState([]);
-  const [tags, setTags] = useState([]);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -72,7 +71,7 @@ const ArticleEditor = () => {
     if (isEditMode) {
       loadArticle();
     }
-  }, [slug]);
+  }, [slug, isEditMode, loadArticle, loadCategories, loadAuthors, loadTags]);
 
   const loadCategories = async () => {
     try {

@@ -24,7 +24,7 @@ const PinterestPinManager = ({ articleId }) => {
     if (articleId) {
       fetchPins();
     }
-  }, [articleId]);
+  }, [articleId, fetchBoards, fetchPins]);
 
   const fetchBoards = async () => {
     try {

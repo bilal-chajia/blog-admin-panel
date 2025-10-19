@@ -86,10 +86,12 @@ export const useCategoriesStore = create((set) => ({
 // Authors Store
 export const useAuthorsStore = create((set) => ({
   authors: [],
+  currentAuthor: null,
   loading: false,
   error: null,
   
   setAuthors: (authors) => set({ authors }),
+  setCurrentAuthor: (author) => set({ currentAuthor: author }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
 }));

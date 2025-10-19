@@ -20,8 +20,8 @@ const CategoriesList = () => {
       if (response.data.success) {
         setCategories(response.data.data);
       }
-    } catch (error) {
-      console.error('Failed to load categories:', error);
+    } catch {
+      console.error('Failed to load categories');
     } finally {
       setLoading(false);
     }
