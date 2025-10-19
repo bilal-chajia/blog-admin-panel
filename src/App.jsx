@@ -8,6 +8,7 @@ import './App.css';
 // Lazy load pages for better performance
 import { lazy, Suspense } from 'react';
 
+const Homepage = lazy(() => import('./pages/homepage/Homepage'));
 const ArticlesList = lazy(() => import('./pages/articles/ArticlesList'));
 const ArticleEditor = lazy(() => import('./pages/articles/ArticleEditor'));
 const CategoriesList = lazy(() => import('./pages/categories/CategoriesList'));
@@ -59,35 +60,38 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
-            
+
+            {/* Homepage */}
+            <Route path="homepage" element={<Homepage />} />
+
             {/* Articles */}
             <Route path="articles" element={<ArticlesList />} />
             <Route path="articles/new" element={<ArticleEditor />} />
             <Route path="articles/:slug" element={<ArticleEditor />} />
-            
+
             {/* Categories */}
             <Route path="categories" element={<CategoriesList />} />
             <Route path="categories/new" element={<CategoryEditor />} />
             <Route path="categories/:slug" element={<CategoryEditor />} />
-            
+
             {/* Authors */}
             <Route path="authors" element={<AuthorsList />} />
             <Route path="authors/new" element={<AuthorEditor />} />
             <Route path="authors/:slug" element={<AuthorEditor />} />
-            
+
             {/* Tags */}
             <Route path="tags" element={<TagsList />} />
             <Route path="tags/new" element={<TagEditor />} />
             <Route path="tags/:slug" element={<TagEditor />} />
-            
+
             {/* Media */}
             <Route path="media" element={<MediaLibrary />} />
-            
+
             {/* Pinterest Boards */}
             <Route path="pinterest/boards" element={<BoardsList />} />
             <Route path="pinterest/boards/new" element={<BoardEditor />} />
             <Route path="pinterest/boards/:id" element={<BoardEditor />} />
-            
+
             {/* Settings */}
             <Route path="settings" element={<Settings />} />
           </Route>

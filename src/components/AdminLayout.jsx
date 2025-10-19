@@ -14,6 +14,7 @@ import {
   Moon,
   ChefHat,
   Pin,
+  Home,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { useUIStore, useAuthStore } from '../store/useStore';
@@ -25,6 +26,7 @@ const AdminLayout = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Homepage', href: '/homepage', icon: Home },
     { name: 'Articles', href: '/articles', icon: FileText },
     { name: 'Categories', href: '/categories', icon: FolderOpen },
     { name: 'Authors', href: '/authors', icon: Users },

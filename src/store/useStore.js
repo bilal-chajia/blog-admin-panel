@@ -128,6 +128,28 @@ export const useTagsStore = create((set) => ({
   setError: (error) => set({ error }),
 }));
 
+// Pinterest Boards Store
+export const usePinterestBoardsStore = create((set) => ({
+  boards: [],
+  loading: false,
+  error: null,
+
+  setBoards: (boards) => set({ boards }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+}));
+
+// Homepage Store
+export const useHomepageStore = create((set) => ({
+  homepage: {},
+  loading: false,
+  error: null,
+
+  setHomepage: (homepage) => set({ homepage }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+}));
+
 // Settings Store
 export const useSettingsStore = create((set) => ({
   settings: {},
@@ -140,5 +162,6 @@ export const useSettingsStore = create((set) => ({
   })),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
+  resetSettings: () => set({ settings: {}, loading: false, error: null }),
 }));
 
