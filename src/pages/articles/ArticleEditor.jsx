@@ -71,7 +71,7 @@ const ArticleEditor = () => {
     if (isEditMode) {
       loadArticle();
     }
-  }, [slug, isEditMode, loadArticle, loadCategories, loadAuthors, loadTags]);
+  }, [slug, isEditMode]);
 
   const loadCategories = async () => {
     try {

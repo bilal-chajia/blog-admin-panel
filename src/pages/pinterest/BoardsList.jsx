@@ -1,56 +1,77 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, ExternalLink, Rss } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Plus, Edit, Trash2, Search, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import { Badge } from '@/components/ui/badge.jsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx';
-import { pinterestBoardsAPI } from '../../services/api';
+import { usePinterestBoardsStore } from '../../store/useStore';
+import ConfirmationModal from '@/components/ui/confirmation-modal.jsx';
 
 const BoardsList = () => {
-  const navigate = useNavigate();
-  const [boards, setBoards] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { boards, loading, error, setBoards } = usePinterestBoardsStore();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    boardToDelete: null
+  });
 
+  // Load mock Pinterest boards on mount
   useEffect(() => {
-    loadBoards();
-  }, []);
+    const mockBoards = [
+      { id: 1, name: 'Quick Recipes', slug: 'quick-recipes', description: 'Fast and easy recipes for busy days', is_active: true, pin_count: 45 },
+      { id: 2, name: 'Healthy Eating', slug: 'healthy-eating', description: 'Nutritious meals and healthy alternatives', is_active: true, pin_count: 32 },
+      { id: 3, name: 'Dessert Ideas', slug: 'dessert-ideas', description: 'Sweet treats and dessert recipes', is_active: false, pin_count: 28 },
+      { id: 4, name: 'Meal Prep', slug: 'meal-prep', description: 'Weekly meal planning and preparation', is_active: true, pin_count: 19 },
+      { id: 5, name: 'Vegetarian Dishes', slug: 'vegetarian-dishes', description: 'Plant-based recipes and vegetarian options', is_active: true, pin_count: 37 },
+    ];
+    setBoards(mockBoards);
+  }, [setBoards]);
 
-  const loadBoards = async () => {
-    try {
-      setLoading(true);
-      const response = await pinterestBoardsAPI.getAll();
-      setBoards(response.data.boards || []);
-    } catch {
-      console.error('Failed to load boards');
-    } finally {
-      setLoading(false);
+  // Filter boards based on search term
+  const filteredBoards = boards.filter(board =>
+    board.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    board.slug.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleDeleteClick = (board) => {
+    setDeleteModal({
+      isOpen: true,
+      boardToDelete: board
+    });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteModal.boardToDelete) {
+      const updatedBoards = boards.filter(board => board.id !== deleteModal.boardToDelete.id);
+      setBoards(updatedBoards);
+      setDeleteModal({ isOpen: false, boardToDelete: null });
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this board?')) return;
-    try {
-      await pinterestBoardsAPI.delete(id);
-      loadBoards();
-    } catch (error) {
-      alert('Failed to delete board');
-    }
+  const handleDeleteCancel = () => {
+    setDeleteModal({ isOpen: false, boardToDelete: null });
   };
 
-  const getRSSFeedURL = (slug) => {
-    const baseURL = import.meta.env.VITE_SITE_URL || 'http://localhost:4321';
-    return `${baseURL}/rss/pinterest/${slug}.xml`;
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-destructive/10 text-destructive p-4 rounded-md">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold">Pinterest Boards</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage Pinterest boards and RSS feeds for automated posting
-          </p>
-        </div>
+        <h2 className="text-3xl font-bold">Pinterest Boards</h2>
         <Link to="/pinterest/boards/new">
           <Button>
             <Plus className="w-4 h-4 mr-2" />
@@ -59,130 +80,82 @@ const BoardsList = () => {
         </Link>
       </div>
 
-      {/* RSS Feed Info Card */}
-      <Card className="border-primary/20 bg-primary/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Rss className="w-5 h-5" />
-            RSS Feeds for Pinterest
-          </CardTitle>
-          <CardDescription>
-            Each board has its own RSS feed containing pins created in the last 24 hours.
-            Use these feeds with IFTTT, Zapier, or Pinterest's native RSS feature.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">Master Feed</Badge>
-              <code className="text-sm bg-muted px-2 py-1 rounded">
-                {import.meta.env.VITE_SITE_URL || 'http://localhost:4321'}/rss/pinterest.xml
-              </code>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              The master feed includes all pins from all active boards.
-            </p>
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Search boards..."
+          className="pl-10"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {/* Boards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredBoards.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-muted-foreground">No boards found</p>
           </div>
-        </CardContent>
-      </Card>
-
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      ) : boards.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">No Pinterest boards yet</p>
-            <Link to="/pinterest/boards/new">
-              <Button variant="outline">Create your first board</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {boards.map((board) => (
-            <Card key={board.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-xl">{board.name}</CardTitle>
-                    <CardDescription className="mt-1">
-                      /{board.slug}
-                    </CardDescription>
-                  </div>
-                  <Badge variant={board.is_active ? 'success' : 'secondary'}>
-                    {board.is_active ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {board.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {board.description}
-                  </p>
-                )}
-
-                {board.board_url && (
-                  <a
-                    href={board.board_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-primary hover:underline"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    View on Pinterest
-                  </a>
-                )}
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">RSS Feed:</span>
-                    <a
-                      href={getRSSFeedURL(board.slug)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-primary hover:underline"
-                    >
-                      <Rss className="w-3 h-3" />
-                      View Feed
-                    </a>
-                  </div>
-                  <input
-                    type="text"
-                    value={getRSSFeedURL(board.slug)}
-                    readOnly
-                    className="w-full text-xs bg-muted px-2 py-1 rounded font-mono"
-                    onClick={(e) => e.target.select()}
-                  />
-                </div>
-
-                <div className="flex gap-2 pt-2 border-t">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => navigate(`/pinterest/boards/${board.id}`)}
-                  >
+        ) : (
+          filteredBoards.map((board) => (
+            <div key={board.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-bold text-lg">{board.name}</h3>
+                <Badge variant={board.is_active ? 'default' : 'secondary'}>
+                  {board.is_active ? 'Active' : 'Inactive'}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">{board.description}</p>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="text-sm text-muted-foreground">
+                  {board.pin_count} pins
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  Slug: {board.slug}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Link to={`/pinterest/boards/${board.id}`}>
+                  <Button size="sm" variant="outline">
                     <Edit className="w-4 h-4 mr-1" />
                     Edit
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDelete(board.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
+                </Link>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-destructive"
+                  onClick={() => handleDeleteClick(board)}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Delete
+                </Button>
+                {board.is_active && (
+                  <Button size="sm" variant="ghost">
+                    <ExternalLink className="w-4 h-4 mr-1" />
+                    View
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Board"
+        description={`Are you sure you want to delete "${deleteModal.boardToDelete?.name}"? This will also delete all associated pins.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };
 
 export default BoardsList;
-

@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input.jsx';
 import { Label } from '@/components/ui/label.jsx';
 import { Textarea } from '@/components/ui/textarea.jsx';
 import { Switch } from '@/components/ui/switch.jsx';
-import { categoriesAPI } from '../../services/api';
+import { useCategoriesStore } from '../../store/useStore';
 import { generateSlug } from '../../utils/helpers';
 
 const CategoryEditor = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const isEditMode = !!slug;
+  const { categories, setCategories } = useCategoriesStore();
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     slug: '',
@@ -32,44 +33,45 @@ const CategoryEditor = () => {
   });
 
   useEffect(() => {
-    if (isEditMode) loadCategory();
-  }, [slug, isEditMode, loadCategory]);
-
-  const loadCategory = async () => {
-    try {
-      const response = await categoriesAPI.getBySlug(slug);
-      if (response.data.success) {
-        const cat = response.data.data;
+    if (isEditMode) {
+      const category = categories.find(cat => cat.slug === slug);
+      if (category) {
         setFormData({
-          slug: cat.slug,
-          label: cat.label,
-          headline: cat.headline,
-          metaTitle: cat.metaTitle,
-          metaDescription: cat.metaDescription,
-          shortDescription: cat.shortDescription,
-          tldr: cat.tldr,
-          imageUrl: cat.image?.url || '',
-          imageAlt: cat.image?.alt || '',
-          collectionTitle: cat.collectionTitle,
-          numEntriesPerPage: cat.numEntriesPerPage,
-          isOnline: cat.isOnline,
-          isFavorite: cat.isFavorite,
-          sortOrder: cat.sortOrder,
+          slug: category.slug,
+          label: category.label,
+          headline: category.headline || '',
+          metaTitle: category.metaTitle || '',
+          metaDescription: category.metaDescription || '',
+          shortDescription: category.shortDescription,
+          tldr: category.tldr || '',
+          imageUrl: category.imageUrl || '',
+          imageAlt: category.imageAlt || '',
+          collectionTitle: category.collectionTitle || '',
+          numEntriesPerPage: category.numEntriesPerPage || 12,
+          isOnline: category.isOnline,
+          isFavorite: category.isFavorite || false,
+          sortOrder: category.sortOrder || 0,
         });
       }
-    } catch {
-      alert('Failed to load category');
     }
-  };
+  }, [slug, isEditMode, categories]);
 
   const handleSave = async () => {
     try {
       setSaving(true);
+
       if (isEditMode) {
-        await categoriesAPI.update(slug, formData);
+        // Update existing category
+        const updatedCategories = categories.map(cat =>
+          cat.slug === slug ? { ...cat, ...formData } : cat
+        );
+        setCategories(updatedCategories);
       } else {
-        await categoriesAPI.create(formData);
+        // Add new category
+        const newCategory = { ...formData };
+        setCategories([...categories, newCategory]);
       }
+
       navigate('/categories');
     } catch {
       alert('Failed to save category');

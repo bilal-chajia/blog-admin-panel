@@ -41,7 +41,7 @@ const ArticlesList = () => {
     loadCategories();
     loadAuthors();
     loadArticles();
-  }, [filters, pagination.page, loadArticles, loadAuthors, loadCategories]);
+  }, [filters, pagination.page]);
 
   const loadArticles = async () => {
     try {

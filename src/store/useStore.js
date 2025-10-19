@@ -72,37 +72,15 @@ export const useArticlesStore = create((set) => ({
   }),
 }));
 
-// Categories Store
-export const useCategoriesStore = create((set) => ({
-  categories: [],
-  loading: false,
-  error: null,
-  
-  setCategories: (categories) => set({ categories }),
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
-}));
-
 // Authors Store
 export const useAuthorsStore = create((set) => ({
   authors: [],
   currentAuthor: null,
   loading: false,
   error: null,
-  
+
   setAuthors: (authors) => set({ authors }),
   setCurrentAuthor: (author) => set({ currentAuthor: author }),
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
-}));
-
-// Tags Store
-export const useTagsStore = create((set) => ({
-  tags: [],
-  loading: false,
-  error: null,
-  
-  setTags: (tags) => set({ tags }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
 }));
@@ -128,12 +106,34 @@ export const useMediaStore = create((set) => ({
   setUploadProgress: (progress) => set({ uploadProgress: progress }),
 }));
 
+// Categories Store
+export const useCategoriesStore = create((set) => ({
+  categories: [],
+  loading: false,
+  error: null,
+
+  setCategories: (categories) => set({ categories }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+}));
+
+// Tags Store
+export const useTagsStore = create((set) => ({
+  tags: [],
+  loading: false,
+  error: null,
+
+  setTags: (tags) => set({ tags }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+}));
+
 // Settings Store
 export const useSettingsStore = create((set) => ({
   settings: {},
   loading: false,
   error: null,
-  
+
   setSettings: (settings) => set({ settings }),
   updateSetting: (key, value) => set((state) => ({
     settings: { ...state.settings, [key]: value }

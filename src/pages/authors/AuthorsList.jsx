@@ -3,10 +3,15 @@ import { useAuthorsStore } from '../../store/useStore';
 import { Button } from '@/components/ui/button.jsx';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ConfirmationModal from '@/components/ui/confirmation-modal.jsx';
 
 const AuthorsList = () => {
   const { authors, loading, error, setAuthors } = useAuthorsStore();
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    authorToDelete: null
+  });
 
   // Charger les auteurs au montage du composant
   useEffect(() => {
@@ -24,6 +29,25 @@ const AuthorsList = () => {
     author.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     author.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleDeleteClick = (author) => {
+    setDeleteModal({
+      isOpen: true,
+      authorToDelete: author
+    });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteModal.authorToDelete) {
+      const updatedAuthors = authors.filter(author => author.slug !== deleteModal.authorToDelete.slug);
+      setAuthors(updatedAuthors);
+      setDeleteModal({ isOpen: false, authorToDelete: null });
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModal({ isOpen: false, authorToDelete: null });
+  };
 
   if (loading) {
     return (
@@ -105,7 +129,12 @@ const AuthorsList = () => {
                           <Edit className="w-4 h-4" />
                         </Button>
                       </Link>
-                      <Button variant="outline" size="icon" className="text-destructive">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive"
+                        onClick={() => handleDeleteClick(author)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -122,6 +151,17 @@ const AuthorsList = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Author"
+        description={`Are you sure you want to delete "${deleteModal.authorToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };
