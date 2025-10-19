@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/useStore';
 import AdminLayout from './components/AdminLayout';
+import ThemeProvider from './components/ThemeProvider';
 import Dashboard from './pages/dashboard/Dashboard';
 import './App.css';
 
@@ -41,8 +42,9 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Login Route */}
           <Route path="/login" element={<Login />} />
@@ -93,8 +95,9 @@ function App() {
           {/* 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Suspense>
-    </BrowserRouter>
+        </Suspense>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

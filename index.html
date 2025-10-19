@@ -8,6 +8,22 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Script pour éviter le flash de thème incorrect au chargement
+      (function() {
+        const theme = localStorage.getItem('ui-store');
+        if (theme) {
+          try {
+            const parsedTheme = JSON.parse(theme);
+            if (parsedTheme.state.theme === 'dark') {
+              document.documentElement.classList.add('dark');
+            }
+          } catch (e) {
+            console.error('Erreur lors du chargement du thème:', e);
+          }
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
