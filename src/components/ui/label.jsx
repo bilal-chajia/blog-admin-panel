@@ -1,23 +1,36 @@
-"use client"
-
 import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
 
-import { cn } from "@/lib/utils"
+const Label = React.forwardRef(({ className, size, ...props }, ref) => {
+  const bulmaClasses = ["label"]
 
-function Label({
-  className,
-  ...props
-}) {
+  if (size) {
+    switch (size) {
+      case "sm":
+        bulmaClasses.push("is-small")
+        break
+      case "lg":
+        bulmaClasses.push("is-large")
+        break
+      case "md":
+        bulmaClasses.push("is-medium")
+        break
+      default:
+        break
+    }
+  }
+
+  if (className) {
+    bulmaClasses.push(className)
+  }
+
   return (
-    <LabelPrimitive.Root
-      data-slot="label"
-      className={cn(
-        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className
-      )}
-      {...props} />
-  );
-}
+    <label
+      className={bulmaClasses.join(" ")}
+      ref={ref}
+      {...props}
+    />
+  )
+})
+Label.displayName = "Label"
 
 export { Label }
